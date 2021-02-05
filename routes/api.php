@@ -18,6 +18,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resources([
-    'genres' => GenreController::class,
+Route::apiResources([
+    'genres' => 'GenreController',
+    'movies' => 'MovieController',
+    'actors' => 'ActorController',
 ]);
+Route::get('genres/{genre}/actors','GenreController@actors')->name('genres.actors');
+Route::resource('actors.appearances', 'AppearanceController')->except('create','edit')->shallow();
+

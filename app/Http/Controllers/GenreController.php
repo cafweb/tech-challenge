@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Traits\HasFetchAllRenderCapabilities;
 use App\Http\Requests\GenreRequest;
+use App\Http\Resources\ActorResource;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -68,16 +69,27 @@ class GenreController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
      * @param Genre $genre
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      * @throws \Exception
      */
     public function destroy(Genre $genre)
     {
+        if ($genre->movies->count() !== 0) {
+            return response()->json([
+                'message' => 'This genre can\'t be removed because it has linked movies.'
+            ], 422);
+        }
         $genre->delete();
 
         return response()->noContent();
+    }
+
+    public function actors(Request $request, Genre $genre)
+    {
+        $this->setGetAllBuilder($genre->actors());
+        $this->setGetAllOrdering('name', 'asc');
+        $this->parseRequestConditions($request);
+        return ActorResource::collection($this->getAll()->paginate());
     }
 }

@@ -16,4 +16,17 @@ class Genre extends Model
     protected $keyType = 'string';
 
     protected $fillable = ['name'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function movies()
+    {
+        return $this->hasMany(Movie::class);
+    }
+
+    public function actors()
+    {
+        return Actor::getActorsInGenre($this);
+    }
 }
